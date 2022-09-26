@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	pb "service-user/proto"
+	pb "service-user/proto/service-user"
 )
 
 type ServiceUser struct{}

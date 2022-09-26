@@ -1,6 +1,6 @@
 {
     "go.inferGopath": false,
     "protoc": {
-        "options": []
+        "options": ["-I ${workspace}/pkg", "-I ${workspace}/thirdparty/"]
     }
 }

@@ -1,4 +1,4 @@
 # don't commit the service binary to vcs
-service-user
+gateway
 *.pb.go
 *.pb.micro.go

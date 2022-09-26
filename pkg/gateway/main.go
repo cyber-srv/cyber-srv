@@ -1,15 +1,15 @@
 package main
 
 import (
-	"service-user/handler"
-	pb "service-user/proto/service-user"
+	"cyber-srv/gateway/handler"
+	pb "cyber-srv/gateway/proto/gateway"
 
 	"go-micro.dev/v4"
 	log "go-micro.dev/v4/logger"
 )
 
 var (
-	service = "service-user"
+	service = "gateway"
 	version = "latest"
 )
 
@@ -22,8 +22,7 @@ func main() {
 	srv.Init()
 
 	// Register handler
-	pb.RegisterServiceUserHandler(srv.Server(), new(handler.ServiceUser))
-
+	pb.RegisterGatewayHandler(srv.Server(), new(handler.Gateway))
 	// Run service
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

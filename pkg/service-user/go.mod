@@ -1,8 +1,11 @@
-module service-user
+module cyber-srv/service-user
 
 go 1.18
 
-require go-micro.dev/v4 v4.1.0
+require (
+	go-micro.dev/v4 v4.1.0
+	service-user v0.0.0-00010101000000-000000000000
+)
 
 require (
 	github.com/Microsoft/go-winio v0.5.0 // indirect
