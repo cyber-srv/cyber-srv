@@ -36,10 +36,7 @@ func NewServiceUserEndpoints() []*api.Endpoint {
 // Client API for ServiceUser service
 
 type ServiceUserService interface {
-	Call(ctx context.Context, in *CallRequest, opts ...client.CallOption) (*CallResponse, error)
-	ClientStream(ctx context.Context, opts ...client.CallOption) (ServiceUser_ClientStreamService, error)
-	ServerStream(ctx context.Context, in *ServerStreamRequest, opts ...client.CallOption) (ServiceUser_ServerStreamService, error)
-	BidiStream(ctx context.Context, opts ...client.CallOption) (ServiceUser_BidiStreamService, error)
+	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error)
 }
 
 type serviceUserService struct {
@@ -54,9 +51,9 @@ func NewServiceUserService(name string, c client.Client) ServiceUserService {
 	}
 }
 
-func (c *serviceUserService) Call(ctx context.Context, in *CallRequest, opts ...client.CallOption) (*CallResponse, error) {
-	req := c.c.NewRequest(c.name, "ServiceUser.Call", in)
-	out := new(CallResponse)
+func (c *serviceUserService) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...client.CallOption) (*GetUserInfoResponse, error) {
+	req := c.c.NewRequest(c.name, "ServiceUser.GetUserInfo", in)
+	out := new(GetUserInfoResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,162 +61,15 @@ func (c *serviceUserService) Call(ctx context.Context, in *CallRequest, opts ...
 	return out, nil
 }
 
-func (c *serviceUserService) ClientStream(ctx context.Context, opts ...client.CallOption) (ServiceUser_ClientStreamService, error) {
-	req := c.c.NewRequest(c.name, "ServiceUser.ClientStream", &ClientStreamRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &serviceUserServiceClientStream{stream}, nil
-}
-
-type ServiceUser_ClientStreamService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*ClientStreamRequest) error
-}
-
-type serviceUserServiceClientStream struct {
-	stream client.Stream
-}
-
-func (x *serviceUserServiceClientStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserServiceClientStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserServiceClientStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserServiceClientStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserServiceClientStream) Send(m *ClientStreamRequest) error {
-	return x.stream.Send(m)
-}
-
-func (c *serviceUserService) ServerStream(ctx context.Context, in *ServerStreamRequest, opts ...client.CallOption) (ServiceUser_ServerStreamService, error) {
-	req := c.c.NewRequest(c.name, "ServiceUser.ServerStream", &ServerStreamRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &serviceUserServiceServerStream{stream}, nil
-}
-
-type ServiceUser_ServerStreamService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*ServerStreamResponse, error)
-}
-
-type serviceUserServiceServerStream struct {
-	stream client.Stream
-}
-
-func (x *serviceUserServiceServerStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserServiceServerStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserServiceServerStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserServiceServerStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserServiceServerStream) Recv() (*ServerStreamResponse, error) {
-	m := new(ServerStreamResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *serviceUserService) BidiStream(ctx context.Context, opts ...client.CallOption) (ServiceUser_BidiStreamService, error) {
-	req := c.c.NewRequest(c.name, "ServiceUser.BidiStream", &BidiStreamRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &serviceUserServiceBidiStream{stream}, nil
-}
-
-type ServiceUser_BidiStreamService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*BidiStreamRequest) error
-	Recv() (*BidiStreamResponse, error)
-}
-
-type serviceUserServiceBidiStream struct {
-	stream client.Stream
-}
-
-func (x *serviceUserServiceBidiStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserServiceBidiStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserServiceBidiStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserServiceBidiStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserServiceBidiStream) Send(m *BidiStreamRequest) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserServiceBidiStream) Recv() (*BidiStreamResponse, error) {
-	m := new(BidiStreamResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // Server API for ServiceUser service
 
 type ServiceUserHandler interface {
-	Call(context.Context, *CallRequest, *CallResponse) error
-	ClientStream(context.Context, ServiceUser_ClientStreamStream) error
-	ServerStream(context.Context, *ServerStreamRequest, ServiceUser_ServerStreamStream) error
-	BidiStream(context.Context, ServiceUser_BidiStreamStream) error
+	GetUserInfo(context.Context, *GetUserInfoRequest, *GetUserInfoResponse) error
 }
 
 func RegisterServiceUserHandler(s server.Server, hdlr ServiceUserHandler, opts ...server.HandlerOption) error {
 	type serviceUser interface {
-		Call(ctx context.Context, in *CallRequest, out *CallResponse) error
-		ClientStream(ctx context.Context, stream server.Stream) error
-		ServerStream(ctx context.Context, stream server.Stream) error
-		BidiStream(ctx context.Context, stream server.Stream) error
+		GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error
 	}
 	type ServiceUser struct {
 		serviceUser
@@ -232,131 +82,6 @@ type serviceUserHandler struct {
 	ServiceUserHandler
 }
 
-func (h *serviceUserHandler) Call(ctx context.Context, in *CallRequest, out *CallResponse) error {
-	return h.ServiceUserHandler.Call(ctx, in, out)
-}
-
-func (h *serviceUserHandler) ClientStream(ctx context.Context, stream server.Stream) error {
-	return h.ServiceUserHandler.ClientStream(ctx, &serviceUserClientStreamStream{stream})
-}
-
-type ServiceUser_ClientStreamStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*ClientStreamRequest, error)
-}
-
-type serviceUserClientStreamStream struct {
-	stream server.Stream
-}
-
-func (x *serviceUserClientStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserClientStreamStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserClientStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserClientStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserClientStreamStream) Recv() (*ClientStreamRequest, error) {
-	m := new(ClientStreamRequest)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (h *serviceUserHandler) ServerStream(ctx context.Context, stream server.Stream) error {
-	m := new(ServerStreamRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.ServiceUserHandler.ServerStream(ctx, m, &serviceUserServerStreamStream{stream})
-}
-
-type ServiceUser_ServerStreamStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*ServerStreamResponse) error
-}
-
-type serviceUserServerStreamStream struct {
-	stream server.Stream
-}
-
-func (x *serviceUserServerStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserServerStreamStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserServerStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserServerStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserServerStreamStream) Send(m *ServerStreamResponse) error {
-	return x.stream.Send(m)
-}
-
-func (h *serviceUserHandler) BidiStream(ctx context.Context, stream server.Stream) error {
-	return h.ServiceUserHandler.BidiStream(ctx, &serviceUserBidiStreamStream{stream})
-}
-
-type ServiceUser_BidiStreamStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*BidiStreamResponse) error
-	Recv() (*BidiStreamRequest, error)
-}
-
-type serviceUserBidiStreamStream struct {
-	stream server.Stream
-}
-
-func (x *serviceUserBidiStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *serviceUserBidiStreamStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *serviceUserBidiStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserBidiStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *serviceUserBidiStreamStream) Send(m *BidiStreamResponse) error {
-	return x.stream.Send(m)
-}
-
-func (x *serviceUserBidiStreamStream) Recv() (*BidiStreamRequest, error) {
-	m := new(BidiStreamRequest)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+func (h *serviceUserHandler) GetUserInfo(ctx context.Context, in *GetUserInfoRequest, out *GetUserInfoResponse) error {
+	return h.ServiceUserHandler.GetUserInfo(ctx, in, out)
 }
