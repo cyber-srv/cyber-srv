@@ -3,15 +3,32 @@ syntax = "proto3";
 package gateway;
 
 import "service-user/proto/service-user.proto";
+import "google/api/annotations.proto";
 
-option go_package = "cyber-srv/gateway";
+option go_package = "./proto/gateway";
 
 service Gateway {
 	rpc Call(CallRequest) returns (CallResponse) {}
 	rpc ClientStream(stream ClientStreamRequest) returns (ClientStreamResponse) {}
 	rpc ServerStream(ServerStreamRequest) returns (stream ServerStreamResponse) {}
 	rpc BidiStream(stream BidiStreamRequest) returns (stream BidiStreamResponse) {}
+	
+	rpc Ping(PingReq) returns (PingRes) {
+		option (google.api.http) = {
+			post: "/ping"
+			body: "*"
+		}
+	}
 }
+
+message PingReq {
+	User user = 1;
+}
+
+message PingRes {
+	User user = 1;
+}
+
 
 message CallRequest {
 	string name = 1;

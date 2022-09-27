@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package serviceuser;
 
-option go_package = "cyber-srv/service-user";
+option go_package = "./proto/service-user";
 
 service ServiceUser {
 	rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {}
