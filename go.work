@@ -3,3 +3,5 @@ go 1.18
 use ./pkg/service-user
 
 use ./pkg/gateway
+
+use ./pkg/tools

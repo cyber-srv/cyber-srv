@@ -8,8 +8,22 @@ init:
 
 .PHONY: proto
 proto:
-	@protoc -I .. --proto_path=. --micro_out=. --go_out=:. proto/gateway.proto
-	@protoc -I .. --proto_path=. --micro_out=. --go_out=:. ../service-user/proto/service-user.proto
+# gateway do not gen micro out
+# gateway *.pb.go & *_gprc.go gen
+	@protoc -I .. -I . -I ../../thirdparty/googleapis-master \
+        --go_out=:. \
+        --go_opt=Mservice-user/proto/service-user.proto=cyber-srv/gateway/proto/service-user \
+		--go-grpc_out=:. \
+        --go-grpc_opt=Mservice-user/proto/service-user.proto=cyber-srv/gateway/proto/service-user \
+        --grpc-gateway_out=:. \
+        --grpc-gateway_opt logtostderr=true \
+        --grpc-gateway_opt generate_unbound_methods=true \
+        proto/gateway.proto
+# service-user *.pb.go & *.pb.micro gen
+	@protoc -I .. -I . \
+        --go_out=:. \
+        --micro_out=. \
+        ../service-user/proto/service-user.proto
 
 .PHONY: update
 update:

@@ -18,6 +18,7 @@ func main() {
 	srv := micro.NewService(
 		micro.Name(service),
 		micro.Version(version),
+		micro.Address(":8080"),
 	)
 	srv.Init()
 
