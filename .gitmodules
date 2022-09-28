@@ -1,3 +1,0 @@
-[submodule "thirdparty/googleapis"]
-	path = thirdparty/googleapis
-	url = git@github.com:googleapis/googleapis.git
