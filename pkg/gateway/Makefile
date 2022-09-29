@@ -18,6 +18,9 @@ proto:
         --grpc-gateway_out=:. \
         --grpc-gateway_opt logtostderr=true \
         --grpc-gateway_opt generate_unbound_methods=true \
+        --grpc-gateway_opt register_func_suffix=GW \
+        --micro_out=:. \
+        --micro_opt=Mservice-user/proto/service-user.proto=cyber-srv/gateway/proto/service-user \
         proto/gateway.proto
 # service-user *.pb.go & *.pb.micro gen
 	@protoc -I .. -I . \

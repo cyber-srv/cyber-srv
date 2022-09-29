@@ -2,15 +2,19 @@ package main
 
 import (
 	"context"
-	"net/http"
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"io/ioutil"
 
+	"cyber-srv/gateway/handler"
 	pb "cyber-srv/gateway/proto/gateway"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go-micro.dev/v4"
 	log "go-micro.dev/v4/logger"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 var (
@@ -26,28 +30,58 @@ func main() {
 	)
 	srv.Init()
 
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	// Register handler
+	// self grpc service
+	pb.RegisterGatewayHandler(srv.Server(), new(handler.Gateway))
 
-	mux := runtime.NewServeMux()
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	// imported grpc service
+	gwmux := runtime.NewServeMux()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	endpoints := map[string]string{
+		"service-user": "localhost:8080",
+	}
 
-	/*
-		grpc.WithInsecure is deprecated: use WithTransportCredentials and insecure.NewCredentials()
-	*/
+	for name, addr := range endpoints {
+		fmt.Println("registering: ", name, addr)
+		pb.RegisterGatewayGWFromEndpoint(context.TODO(), gwmux, addr, opts)
+	}
 
-	endpoints := ":8080"
-	err := pb.RegisterGatewayHandlerFromEndpoint(ctx, mux, endpoints, opts)
+	srv.Server().Handle(srv.Server().NewHandler(gwmux))
+
+	// Run service
+	if err := srv.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getCred() (*tls.Certificate, credentials.TransportCredentials) {
+	var err error
+	key, err := ioutil.ReadFile("./certs/_wildcard.jinyi.test-key.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	http.ListenAndServe(":8081", mux)
-	// Register handler
-	// pb.RegisterGatewayHandler(srv.Server(), new(handler.Gateway))
-	// Run service
-	// if err := srv.Run(); err != nil {
-	// 	log.Fatal(err)
-	// }
+	cert, err := ioutil.ReadFile("./certs/_wildcard.jinyi.test.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pair, err := tls.X509KeyPair(cert, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// cert pool
+	certPool := x509.NewCertPool()
+	ok := certPool.AppendCertsFromPEM(cert)
+	if !ok {
+		log.Fatal("failed to parse root certificate")
+	}
+
+	tlsCred := credentials.NewTLS(&tls.Config{
+		ServerName: "jinyi.test",
+		RootCAs:    certPool,
+	})
+
+	return &pair, tlsCred
 }
